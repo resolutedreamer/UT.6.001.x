@@ -84,11 +84,22 @@ int main(void)
 	TExaS_Init(SW_PIN_PE210, LED_PIN_PB543210); // activate grader and set system clock to 80 MHz
 	EnableInterrupts();
 	PortInit();
-	LEDInit();
-
+	SysTick_Init();
+	
+	LEDInit(); // put the system into the proper initial state
+	
+	
 	while (1)
 	{
-		SysTickDelayer(50);
+		//output based on current state
+		GPIO_PORTF_DATA_R = Fsm[cState].out<<2; //Output to PF2
+		// wait for time relevant to state
+		SysTick_Wait10ms(Fsm[cState].wait);   
+		// get input     
+		input = (~GPIO_PORTF_DATA_R & 0x10)>>4;// Input 0/1: Sw1 NotPressed/Pressed
+		// change state based on input and current state
+		cState = Fsm[cState].next[input]; 
+
 	}
 }
 
@@ -158,4 +169,26 @@ void Delay100ms(void)
     halfsecs--;
   }
 }
+
+
+// represents a State of the FSM 
+struct State {
+   unsigned char out;   // output for the state
+   unsigned short wait;     // Time to wait when in this state
+   unsigned char next[2]; // Next state array
+};
+
+typedef const struct State StateType;
+
+//Shortcuts to refer to the various states in the FSM array
+#define Even 0
+#define Odd 1
+
+//The data structure that captures the FSM state transition graph
+StateType Fsm[2] = { 
+   {0, 100, {Even,Odd}},
+   {1, 100, {Odd,Even}}
+}; 
+
+unsigned char cState; //Current state is Even/Odd
 
