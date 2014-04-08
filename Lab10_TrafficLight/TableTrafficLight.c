@@ -74,6 +74,28 @@ unsigned long WalkRed = 0;
 #define PE1 (*((volatile unsigned long *)0x40024008))
 #define PE2 (*((volatile unsigned long *)0x4002400C))
 
+// This section needs to be edited for our system
+// represents a State of the FSM 
+struct State {
+   unsigned char out;   // output for the state
+   unsigned short wait;     // Time to wait when in this state
+   unsigned char next[2]; // Next state array
+};
+
+typedef const struct State StateType;
+
+//Shortcuts to refer to the various states in the FSM array
+#define Even 0
+#define Odd 1
+
+//The data structure that captures the FSM state transition graph
+StateType Fsm[2] = { 
+   {0, 100, {Even,Odd}},
+   {1, 100, {Odd,Even}}
+}; 
+
+unsigned char cState; //What state we are in now?
+
 
 
 
@@ -152,43 +174,4 @@ void LEDInit(void)
 {
     // blank for now
 }
-
-
-
-//leftover from previous code, leave it alone for now until we write a new delay function
-void Delay100ms(void)
-{
-    unsigned long halfsecs = 1;
-    unsigned long count;
-  
-  while(halfsecs > 0 ) { // repeat while there are still halfsecs to delay
-    count = 1538460; // 400000*0.5/0.13 that it takes 0.13 sec to count down to zero
-    while (count > 0) { 
-      count--;
-    } // This while loop takes approximately 3 cycles
-    halfsecs--;
-  }
-}
-
-
-// represents a State of the FSM 
-struct State {
-   unsigned char out;   // output for the state
-   unsigned short wait;     // Time to wait when in this state
-   unsigned char next[2]; // Next state array
-};
-
-typedef const struct State StateType;
-
-//Shortcuts to refer to the various states in the FSM array
-#define Even 0
-#define Odd 1
-
-//The data structure that captures the FSM state transition graph
-StateType Fsm[2] = { 
-   {0, 100, {Even,Odd}},
-   {1, 100, {Odd,Even}}
-}; 
-
-unsigned char cState; //Current state is Even/Odd
 
