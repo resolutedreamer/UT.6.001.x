@@ -51,30 +51,29 @@ void SysTick_Init(void){
                                         // enable SysTick with core clock
   NVIC_ST_CTRL_R = NVIC_ST_CTRL_ENABLE+NVIC_ST_CTRL_CLK_SRC;
 }
-
-
-
 //adjust for the 80 MHz clock
-
-
-
 
 
 // Time delay using busy wait.
 // The delay parameter is in units of the core clock. (units of 20 nsec for 50 MHz clock)
-void SysTick_Wait(unsigned long delay){
+void SysTick_Wait(unsigned long delay)
+{
   volatile unsigned long elapsedTime;
   unsigned long startTime = NVIC_ST_CURRENT_R;
-  do{
+  do
+	{
     elapsedTime = (startTime-NVIC_ST_CURRENT_R)&0x00FFFFFF;
   }
   while(elapsedTime <= delay);
-}
+}	
+
+
 // Time delay using busy wait.
 // This assumes 50 MHz system clock.
-void SysTick_Wait10ms(unsigned long delay){
+void SysTick_Wait10ms(unsigned long delay)
+{
   unsigned long i;
   for(i=0; i<delay; i++){
-    SysTick_Wait(500000);  // wait 10ms (assumes 50 MHz clock)
+    SysTick_Wait(800000);  // wait 10ms (assumes 80 MHz clock)
   }
 }

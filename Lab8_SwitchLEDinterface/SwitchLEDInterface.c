@@ -71,7 +71,7 @@ int main(void){
             }            
             PE1 = output;
             // GPIO_PORTE_DATA_R = output;            
-         }
+        }
 
     }
   
